@@ -4,14 +4,14 @@ baseURL = "http://yiou.me/blog"
 theme = "beautifulhugo"
 pygmentsUseClasses = true
 pygmentCodeFences = true
-#disqusShortname = "XXX"
+disqusShortname = "code-z"
 
 [taxonomies]
 tag = "tags"
 category = "categories"
 
 [params]
-  subtitle = "Build a beautiful and simple website in minutes"
+  subtitle = "Front-end, Game Dev and Scribbles"
   #logo = "img/avatar-icon.png"
   favicon = "img/favicon.ico"
   commit = false
@@ -20,7 +20,7 @@ category = "categories"
   name = "Yiou Chen"
   email = "chen.yiou1992@gmail.com"
   github = "yiochen"
-  linkedin = "yiochen"
+  linkedin = "yiouchen"
 
 [[menu.main]]
     name = "Blog"
@@ -35,4 +35,9 @@ category = "categories"
 [[menu.main]]
     name = "Tags"
     url = "/tags"
+    weight = 3
+
+[[menu.main]]
+    name = "Portfolio"
+    url = "http://yiou.me"
     weight = 3
