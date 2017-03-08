@@ -37,3 +37,18 @@ We also need D3. Angular 2 uses TyoeScript, so we need the type definition for D
 npm install --save d3
 npm install --save-dev @types/d3
 ```
+
+For this demo, I am using Angular `2.4.0`, D3  `4.7.1`.
+
+## Create BarChartComponent
+
+run generator to create a component skeleton
+
+```
+ng generate component bar-chart
+```
+There are some [life cycle hooks](https://angular.io/docs/ts/latest/guide/lifecycle-hooks.html) that will be important for intergrating Angular 2 and D3.  
+- **OnChange** ngOnChange is called when a input value changes. This is when we call D3 to recalculate the values. Very important to note that, it will be called even before the dom for the component is created. If you want to use D3 to modify the Dom (as we will talk about later), you need to make sure the dom exists.
+- **AfterViewInit** If we need to use D3 to do some complex SVG generation, we need to make sure we do that after ngAfterViewInit is called.
+- **OnDestroy** You might not need this, because Angular is smart enough to clear all the content even if it's created by D3. But if you have some on going service upon destruction of the component, it might be safe to clean it up in ngOnDestroy to prevent memory leak.
+- 
