@@ -39,9 +39,11 @@ Uncaught TypeError: Failed to execute 'requestAnimationFrame' on 'Window': The c
 
 The reason is that, even though TypeScript has class syntax (same for ES6), under the hood, it still uses prototype in JavaScript. A method is loosely tied to the prototype of an object. Object knows about the method, but method doesn't know who its owner is, until its invocation.
 
-When a method is invoked, it's finally told about it's owner, owner will be assigned to the `this`. Note that `this` is a keyword, you cannot assign anything to it.
+When a method is invoked, it's finally told about it's owner. You can access the owner (or context) using`this`. Note that `this` is a keyword, you cannot assign anything to it.
 
-If you invoke the method using an object, for example `obj.loop()`, `this` for `loop` will be `obj`. If a method is invoked by itself, `this` by default will be set to a Global Object. In the context of HTML document, the Global Object is `window`. The Simplest example to tryout is
+If you invoke the method using an object, for example `obj.loop()`, `this` for `loop` will be `obj`. If a method is invoked by itself, `this` by default will be set to a Global Object. In the context of HTML document, the Global Object is `window`. 
+
+The simplest example to tryout is
 
 ```Javascript
 // Javascript
@@ -49,10 +51,10 @@ window.color = "red";
 function printColor() {
 	console.log(this.color);
 }
-printColor();
+printColor(); // red
 ```
 
-In JavaScript, we all learned that `this` is very dangerous. Sometimes this would change. Traditionally, we would do somthing like
+In JavaScript, we all learned that `this` is very dangerous. Sometimes `this` would change. Traditionally, we would do somthing like
 
 ```Javascript
 ...
@@ -63,7 +65,7 @@ setTimeout(function () {
 ...
 ```
 
-But when we have all the goodies such as class declaration, we (at least myself) tend to treat JavaScript like a class-based Object Oriented language. That's why it caused this bug. So what's the fixed? Back to the first code snippet, there are multiple ways to fix this. 
+But when we have all the goodies such as class declaration, we (at least myself) tend to treat JavaScript like a class-based Object Oriented language. That's why it caused this bug. So what's the fix? Back to the first code snippet, there are multiple ways to fix this. 
 
 One way is to `bind` the `this` context to the function.
 
@@ -106,7 +108,7 @@ public class Program
         Apple apple = new Apple();
         Program pro = new Program();
         pro.del = apple.PrintColor;
-        pro.Run();
+        pro.Run(); // prints yellow
     }
 }
 
@@ -122,4 +124,4 @@ public class Apple{
 }
 ```
 
-The program prints `yellow`. which means that delegates in C# remember it's owner.
+The program prints `yellow`. which means that delegates in C# remember its owner.
