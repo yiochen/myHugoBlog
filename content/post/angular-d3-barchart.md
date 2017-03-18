@@ -1,5 +1,5 @@
 +++
-subtitle = "experiment about the separation of concerns"
+subtitle = "with the separation of concerns"
 draft = false
 categories = []
 tags = ["Angular2", "D3"]
@@ -13,11 +13,11 @@ bigimg = ""
 
 > a Javascript library for manipulating documents based on data.
 
-In another word, it loves modifying dom.
+In other words, it loves modifying the Dom.
 
-That's a problem, both framework/library do a great job in manipulating the DOM (although I prefer Angular's way), which one should have control? A lot of examples I saw online let D3 handles all of DOM manipulation. In this post, I will try to use another approach. I will let D3 handle mostly the calculation, while let Angular handle the DOM manipulation. Let's make a simple bar chart.
+That's a problem, both framework/library do a great job in manipulating the Dom(although I prefer Angular's way), which one should have control? A lot of examples I saw online let D3 handles all of DOM manipulation. In this post, I will try to use another approach. I will let D3 handle mostly the calculation, while let Angular handle the DOM manipulation. Let's make a simple bar chart.
 
-Some of the ideas are referencing from this [awesome article](http://alexandros.resin.io/angular-d3-svg/)
+Some of the ideas are from this [awesome article](http://alexandros.resin.io/angular-d3-svg/)
 
 ## Setup
 
@@ -31,7 +31,7 @@ cd BarChart
 ng serve
 ```
 
-We also need D3. Angular 2 uses TyoeScript, so we need the type definition for D3. We can install D3 using following commands:
+We also need D3. Angular 2 uses TypeScript, so we need the type definition for D3. We can install D3 using following commands:
 
 ```bash
 npm install --save d3
@@ -42,19 +42,19 @@ For this demo, I am using Angular `2.4.0`, D3  `4.7.1`.
 
 ## Create BarChartComponent
 
-run generator to create a component skeleton
+Run generator to create a component skeleton
 
 ```
 ng generate component bar-chart
 ```
 There are some [life cycle hooks](https://angular.io/docs/ts/latest/guide/lifecycle-hooks.html) that will be important for intergrating Angular 2 and D3.  
 - **OnChange** ngOnChange is called when a input value changes. This is when we call D3 to recalculate the values. Very important to note that, it will be called even before the dom for the component is created. If you want to use D3 to modify the Dom (as we will talk about later), you need to make sure the dom exists.
-- **AfterViewInit** If we need to use D3 to do some complex SVG generation, we need to make sure we do that after ngAfterViewInit is called.
-- **OnDestroy** You might not need this, because Angular is smart enough to clear all the content even if it's created by D3. But if you have some on going service upon destruction of the component, it might be safe to clean it up in ngOnDestroy to prevent memory leak.
+- **AfterViewInit** This is called when the Dom of the oomponent becomes available(the current component's Dom, not necessarily the children's Dom). If we need to use D3 to do some complex SVG generation, we need to make sure we do that after ngAfterViewInit is called.
+- **OnDestroy** You might not need this, because Angular is smart enough to clear all the content even if it's created by D3. But if you have some on-going service upon destruction of the component, it might be safe to clean it up in ngOnDestroy to prevent memory leak.
 
 One more thing to keep in mind is that, svg doesn't allow any properties that it doesn't understand. So we cannot bind attributes like `height`, `width` directly. If you do that, it will complain  
 ![error](http://res.cloudinary.com/yiou-me/image/upload/post-angular-barchart/error.png)  
-So we need to bind everything using attribute binding.
+So we need to bind everything using [attribute binding](https://angular.io/docs/ts/latest/guide/template-syntax.html#!#other-bindings).
 
 Ok, let's code this component.
 
@@ -168,7 +168,7 @@ The result will be similar to the following image
 
 ![barchart basic](http://res.cloudinary.com/yiou-me/image/upload/post-angular-barchart/barchart1.png)
 
-I need to point out something here. As you can see below, I defined the yScale using an opposite domain and range. I also calculate the as the difference between chartHeight and the return value of the scale.
+I need to point out something here. As you can see below, I defined the yScale using an opposite domain and range. I also calculate the height as the difference between `chartHeight` and the return value of the scale.
 ```typescript
 // inside ngOnChanges
 this.yScale = D3.scaleLinear()
@@ -177,17 +177,17 @@ this.yScale = D3.scaleLinear()
 // inside barHeight
 return this.clampHeight(this.chartHeight - this.yScale(value));
 ```
-<p id="axis-at-bottom">The reason for this is so that the origin(zero) of y-axis is at the bottom. When we change the value for each bar, we can see the top of the bar moving up or down, instead of the bottom. This might not be obvious, but when we add the transition, you will be able to see the effect.</p>
+<p id="axis-at-bottom">The reason for this is so that the origin(zero) of y-axis is at the bottom. Basically I flipped the bars upside down. When we change the value for each bar, we can see the top of the bar moving up or down, instead of the bottom. This might not be obvious, but when we add the transition, you will be able to see the effect.</p>
 
 Another thing is, I tried to use local variable to cache some calculation results such as `transform` . By default, [angular change detection](https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html) will check all the template bindings every time. If a function or getter is used in the template, the function/getter will be called every time.
 
 ## Create Axes
 Let's add the x and y axes to the chart.
-D3 provides a very powerful tool for generating SVG axes called [d3-axis](https://github.com/d3/d3-axis). For axis, we would actually want to let D3 to handle the Dom manipulation, because it will be too much trouble to reinvent the wheel.
+D3 provides a very powerful tool for generating SVG axes called [d3-axis](https://github.com/d3/d3-axis). For axes, we would actually want to let D3 to handle the Dom manipulation, because it will be too much trouble to reinvent the wheel.
 
-We cannot use custom components in svg elements, because svg is not html, it is actually xml. If it sees any tags that it doesn't understand, it will yell at you. But we can use Angular [directives](https://angular.io/docs/ts/latest/guide/attribute-directives.html).
+We cannot use custom components in svg elements, because svg is not html. It is xml. If it sees any tags that it doesn't understand, it will yell at you. But we can use Angular [directives](https://angular.io/docs/ts/latest/guide/attribute-directives.html).
 
-Generate a template for template
+Generate a template for directive
 ```bash
 ng generate directive d3-axis
 ```
@@ -232,7 +232,7 @@ export class D3AxisDirective {
 ```
 This is very straight forward. We will use this directive on a `<g>` element. To get a reference to the native Dom, we inject it into the constructor. `D3.axisLeft` and `D3.axisBottom` both take a scale and generate the ticks and labels. We are allowed to call them every time input changes, because they will remove the old axes if there are any, and create new ones. Make sure we call `drawAxis` after `ngAfterViewInit` because that's when the Dom becomes available.
 
-We can use this directive in our `BarChartComponent`, but before that, we need to make some changes. We need to leave some space in the left and bottom of the chart for the axes. let's add two inputs to the `BarChartComponent`  
+We can use this directive in our `BarChartComponent`, but before that, we need to make some changes. We need to leave some space at the left and bottom of the chart for the axes. let's add two inputs to the `BarChartComponent`  
 ```typescript
  @Input() paddingLeft = 30;
  @Input() paddingBottom = 20;
@@ -283,7 +283,7 @@ Remember we said [before](#axis-at-bottom), I intentially set the `yScale` to st
 ![chart2](http://res.cloudinary.com/yiou-me/image/upload/post-angular-barchart/barchart2.png)
 
 ## Make it responsive
-Next step, we will make the chart auto-resizable when the container size change. Even though SVG stands for Scalable Vector Graphics, it doesn't mean it can auto scale (we can use [viewbox](https://css-tricks.com/scale-svg/#article-header-id-4), but that will scale the text too). My approach here is to watch for container size using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) and change the height and width inputs on the `BarChartComponent`. Let's make it into a directive, so that we can reuse it for other charts too.
+Next step, we will make the chart auto-resizable when the container size change. Even though SVG stands for Scalable Vector Graphics, doesn't mean it can auto scale (we can use [viewbox](https://css-tricks.com/scale-svg/#article-header-id-4), but that will scale the text too). My approach here is to watch for container size using [`requestAnimationFrame`](https://developer.mozilla.org/en-US/docs/Web/API/window/requestAnimationFrame) and change the height and width inputs on the `BarChartComponent`. Let's make it into a directive, so that we can reuse it for other charts too.
 
 Create an auto-resize directive
 ```bash
@@ -325,7 +325,7 @@ export class AutoResizeDirective implements AfterViewInit, OnDestroy {
 }
 ```
 
-This directive will detect the size change of any container. The method `checkDimension` will be called during each animation frame. What is does is simply read the height and width from dom, and then assign to the local variable. We can then bind the height and width properties to `BarChartComponent`.
+This directive will detect the size change of any container. The method `checkDimension` will be called during each animation frame. What is does is simply reading the height and width from dom, and then assigning them to the local variables. We can then bind the height and width to `BarChartComponent`.
 
 Let's update the `app.component.html`
 ```xml
@@ -339,11 +339,11 @@ Let's update the `app.component.html`
     ></app-d3-bar-chart>
 </div>
 ```
-We also exported the directive as `autoResize`, so that we can reference it in the template.
+We exported the directive as `autoResize`, so that we can reference it in the template.
 
 The height and width will be used to bind to inputs, so we need to be very careful not to changed them when Angular finishes the change detection. Note that I didn't call `checkDimension` inside `ngAfterViewInit`, this is because in dev mode, Angular adds another check to make sure that no input has changed after the change detection. Angular will call `ngOnChanges`,`ngDoCheck` from parent(`BarChartComponent`) before `ngAfterViewInit` of child(`AutoResizeDirective`). If we change the height and width in child's `ngAfterViewInit`, Angular will complain.
 
-But we are allow to change them in `requestAnimationFrame`, because they are actually called before change detections. If you want to know more about Angular 2's change detection, there is a thorough [explanation](https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html) on that.
+But we are allowed to change them in `requestAnimationFrame`, because `requestAnimationFrame` is actually called before change detections. If you want to know more about Angular 2's change detection, there is a thorough [explanation](https://blog.thoughtram.io/angular/2016/02/22/angular-2-change-detection-explained.html) on that.
 
 Now, if we set the width of the chart to 100%, we can see it auto-resizing. 
 ###### app.component.css
@@ -367,4 +367,6 @@ rect {
     transition: height 1s ease, width 1s ease;
 }
 ```
-To make it work cross platform, we need to use [D3-transition](https://github.com/d3/d3-transition). I will leave it to another post coming up. If you want to see the complete code. You can view this [github repo](https://github.com/yiochen/BarChart)
+To make it work cross platform, we need to use [D3-transition](https://github.com/d3/d3-transition). I will leave it to another post coming up. That's it for this post. There is still a lot to improve. But this is just a proof of concept. It shows that it's possible to separate the responsibilities when using Angular 2 and D3. I will write more about this in the future.
+
+If you want to see the complete code. You can view this [github repo](https://github.com/yiochen/BarChart)
