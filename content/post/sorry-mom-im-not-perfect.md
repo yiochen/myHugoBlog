@@ -4,7 +4,7 @@ bigimg = ""
 subtitle = ""
 date = "2017-03-24T23:34:04-04:00"
 title = "Sorry mom, I'm not perfect"
-draft = false
+draft = true
 categories = []
 
 +++
