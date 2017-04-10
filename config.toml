@@ -1,6 +1,6 @@
 languageCode = "en-us"
 title = "code zilla"
-baseURL = "http://yiou.me/blog"
+baseURL = "https://yiochen.github.io/blog"
 theme = "beautifulhugo"
 pygmentsUseClasses = true
 pygmentCodeFences = true

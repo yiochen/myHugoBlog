@@ -1,5 +1,5 @@
 +++
-draft = false
+draft = true
 categories = []
 date = "2017-03-30T00:59:40-04:00"
 title = "Angular 2 State Aware Pipes"
