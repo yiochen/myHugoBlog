@@ -32,8 +32,8 @@ As far as I know, Jasmine doesn't have any official documentation on creating cu
 
 These are the requirement: 
 
-1.  The asymmetric matcher needs to be a function that takes two arguments. The first argument is the test element (the one you wrap inside `expect`); the second argument is `customTesters`, which is [another way](https://jasmine.github.io/2.2/custom_equality.html) to achieve custom comparison. For the scope of this article, we will not use the second argument.
-2.  The asymmetric matcher needs to expose a field `asymmetricMatch`, which is a function that takes one argument, the expected argument.
+1.  An asymmetric matcher needs to be a function.
+2.  The asymmetric matcher needs to expose a field `asymmetricMatch`, which is a function that takes two arguments. The first argument is the test element (the one you wrap inside `expect`); the second argument is `customTesters`, which is [another way](https://jasmine.github.io/2.2/custom_equality.html) to achieve custom comparison. For the scope of this article, we will not use the second argument.
 3.  You can provide optional reporting when test fails by providing a `jasmineToString` method.
 
 Let's say we need to test phone numbers, but the phone numbers we get are in different formats. For example (I am using American phone numbers), `123-456-7890`, or `(123)456-7890`. We can't simply `toEqual` because that will do string comparison and the two numbers will be considered not equal. 
